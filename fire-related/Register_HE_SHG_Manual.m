@@ -1,4 +1,5 @@
 %Image registration
+%By Jeremy Bredfeldt at LOCI UW-Madison
 
 %clear all;
 close all;
