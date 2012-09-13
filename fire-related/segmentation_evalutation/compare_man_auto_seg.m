@@ -22,13 +22,13 @@ dist_thresh = 0.5; %relative to fiber length
 len_thresh = 2; %relative to fiber length
 
 %open the manual segmentation mat file
-man_mat = load('roi_mc.mat');
+man_mat = load('roi_jb.mat');
 %open the auto segmentation mat file
 auto_mat = load('all_extracted_crops.mat');
 %output file
-out_fname = 'compare_man_auto_seg_out_mc.txt';
+out_fname = 'compare_man_auto_seg_out_jb.txt';
 file_id = fopen(out_fname, 'w+');
-fprintf(file_id,'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\r\n', 'name', 'precision', 'recall', 'fmeas', 'overseg', 'underseg', 'num_man_fibers', 'num_auto_fibers');
+fprintf(file_id,'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\r\n', 'name', 'precision', 'recall', 'fmeas', 'overseg', 'underseg', 'num_man_fibers', 'num_auto_fibers', 'true_pos_rt', 'false_pos_rt');
 fclose(file_id);
 
 %first image, first method, first crop, first fiber
@@ -172,9 +172,9 @@ for i = 1:num_images
                     end
                 end
             end %cross check all fibers in this crop
-            [precision recall fmeas overseg underseg] = comp_roc(assoc_arr_man, assoc_arr_auto);
+            [precision recall fmeas overseg underseg true_pos_rt false_pos_rt] = comp_roc(assoc_arr_man, assoc_arr_auto, len_arr_man, len_arr_auto);
             file_id = fopen(out_fname, 'a+');
-            fprintf(file_id,'%s\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%d\t%d\r\n', auto_name, precision, recall, fmeas, overseg, underseg, num_man_fibers, num_auto_fibers);
+            fprintf(file_id,'%s\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%0.3f\t%d\t%d\t%0.3f\t%0.3f\r\n', auto_name, precision, recall, fmeas, overseg, underseg, num_man_fibers, num_auto_fibers, true_pos_rt, false_pos_rt);
             fclose(file_id);
             %assoc_arr_man
             disp('0000000000000000000000000');
