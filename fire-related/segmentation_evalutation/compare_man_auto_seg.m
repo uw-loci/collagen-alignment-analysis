@@ -15,7 +15,7 @@ clear all;
 %close all;
 clc;
 
-plot_on = 0;
+plot_on = 1;
 
 ang_thresh = 0.3;
 dist_thresh = 0.5; %relative to fiber length
@@ -26,7 +26,7 @@ man_mat = load('roi_jb.mat');
 %open the auto segmentation mat file
 auto_mat = load('all_extracted_crops.mat');
 %output file
-out_fname = 'compare_man_auto_seg_out_jb.txt';
+out_fname = 'compare_man_auto_seg_out_jb_2.txt';
 file_id = fopen(out_fname, 'w+');
 fprintf(file_id,'%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\r\n', 'name', 'precision', 'recall', 'fmeas', 'overseg', 'underseg', 'num_man_fibers', 'num_auto_fibers', 'true_pos_rt', 'false_pos_rt');
 fclose(file_id);
@@ -78,6 +78,7 @@ for i = 1:num_images
                 end
                 
                 [ang_array avg_ang std_ang ent_ang curvature] = avg_angle(pts_x, pts_y);
+                
                 
                 [len_array total_len] = fiber_length(pts_x, pts_y);
                 
@@ -164,7 +165,7 @@ for i = 1:num_images
                                     disp(['ang_dif = ' num2str(ang_dif)]);
                                     disp(['tot_dist = ' num2str(tot_dist)]);
                                     disp(['len_dif = ' num2str(len_dif)]);                                    
-                                    %pause;
+                                    pause;
                                 end                                
                             end
                         end
@@ -178,7 +179,7 @@ for i = 1:num_images
             fclose(file_id);
             %assoc_arr_man
             disp('0000000000000000000000000');
-            %pause;
+            pause;
             
         end
         disp('-----------');

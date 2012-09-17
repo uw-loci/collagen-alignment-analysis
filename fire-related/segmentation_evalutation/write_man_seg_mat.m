@@ -12,7 +12,7 @@ close all;
 clc;
 
 iJ_top_dir = 'Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\ROI_Conklin\unzipped\';
-out_name = '.\roi_mc.mat';
+out_name = '.\roi_mc2.mat';
 
 case_list = dir(iJ_top_dir);
 
@@ -33,6 +33,7 @@ for n = 1:length(case_list)
         case_cnt = case_cnt + 1;
         case_dir = [iJ_top_dir case_name '\'];
         roi_list = dir(case_dir);
+        %subtract 2 below to account for ./ and ../
         num_rois = length(roi_list)-2;
         roi_struct(num_rois) = struct('npoints', [],... 
                                       'xpoints', [],...
