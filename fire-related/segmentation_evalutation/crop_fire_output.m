@@ -23,9 +23,9 @@ case_struct(5).name = 'test24';
 %algorithms (order doesn't matter as much)
 algo_str(num_algorithms) = struct('name', []);
 %algo_str(5).name = '-FIREout';
-algo_str(4).name = '-FIREoutTUB';
+algo_str(4).name = '-FIREoutGF';
 algo_str(3).name = '-FIREoutSTV';
-algo_str(2).name = '-FIREoutGF';
+algo_str(2).name = '-FIREoutTUB';
 algo_str(1).name = '-FIREoutCTr';
 
 
