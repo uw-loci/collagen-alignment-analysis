@@ -11,7 +11,8 @@ display_on = 0;
 %cases (order really matters)
 num_cases = 5; %full images
 num_crops = 5; %cropped out regions from each image
-num_algorithms = 5; %ways of processing the data
+num_params = 5; %number of parameters we are optimizing over for each algorithm
+num_algorithms = 4; %ways of processing the data
 case_struct(num_cases) = struct('name', [], 'crop_x', [], 'crop_y', []);
 case_struct(1).name = 'test7';
 case_struct(2).name = 'test21';
@@ -21,11 +22,13 @@ case_struct(5).name = 'test24';
 
 %algorithms (order doesn't matter as much)
 algo_str(num_algorithms) = struct('name', []);
-algo_str(5).name = '-FIREout';
+%algo_str(5).name = '-FIREout';
 algo_str(4).name = '-FIREoutTUB';
 algo_str(3).name = '-FIREoutSTV';
 algo_str(2).name = '-FIREoutGF';
 algo_str(1).name = '-FIREoutCTr';
+
+
 
 %-----------------------------------------
 %x positions of crops
@@ -105,94 +108,92 @@ crop_h = 128;
 
 
 %directory where all the fiber results are stored
-src_dir = 'Z:\liu372\fiberextraction\testresults\081612\';
+src_dir = 'E:\Images\FIRE_Results\';
 
-exp_struct(num_cases) = struct('name', [], 'method_struct', []);
+complete_struct(num_cases*num_algorithms*num_params*num_crops) = struct('case_name', [], 'case_idx', [], 'algo_name', [], 'algo_idx', [], 'param_name', [], 'param_idx', [], 'crop_name', [], 'crop_idx', [], 'fiber_list', []);
+
+str_idx = 1; %structure index
+%exp_struct(num_cases) = struct('name', [], 'method_struct', []);
 for i = 1:num_cases
-%for i = 2:2
-    case_name = case_struct(i).name;
-    
-    exp_struct(i).name = case_name;
-    method_struct(num_algorithms) = struct('name', [], 'image_struct', []);
-    
-for j = 1:num_algorithms
-    algo_name = algo_str(j).name;
-    mat_path = [src_dir case_name algo_name '.mat']
-    full_fib_struct = load(mat_path);
-    if (j == 1 && display_on)
-        %open and display the image
-        %full_image = imread('Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\original_images\TACS-3a.tif');
-        full_image = imread('Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\original_images\04_25_12 Trentham DCIS 542805 -02.tif');
-        figure(1); hold off; imshow(full_image); hold on;
-    end
-    method_struct(j).name = algo_name;
-    image_struct(num_crops) = struct('name', [], 'crop_struct', []);
-    
-for k = 1:num_crops
-    disp(['crop number = ' int2str(k)]);
-    
-    %these are the positions of the crops
-    x1 = case_struct(i).crop_x(k);
-    x2 = x1 + crop_w;
-    y1 = case_struct(i).crop_y(k);
-    y2 = y1 + crop_h;
-    %create a new fiber structure for fibers that are inside cropped region
-    crop_fib_ind = 0;
-    
-    image_struct(k).name = ['crop' num2str(k)];
-    crop_struct = struct('indiv_fib_struct', []);
-    
-    num_fib = length(full_fib_struct.data.Fai);
-    %loop through each fiber in entire structure
-    for m = 1:num_fib
-        fib_len = 0;
-        num_pts = length(full_fib_struct.data.Fai(m).v);
-        %loop through all points in the fiber
-        for n = 1:num_pts
-            ind = full_fib_struct.data.Fai(m).v(n);
-            %row_pt and col_pt are the positions in the full image
-            row_pt = full_fib_struct.data.Xai(ind,2);
-            col_pt = full_fib_struct.data.Xai(ind,1);
-            if (row_pt >= y1 && row_pt <= y2 && col_pt >= x1 && col_pt <= x2)
-                
-                %there is a point on this fiber that is in the cropped
-                %region
+%for i = 2:2    
+    case_name = case_struct(i).name;                
+    for j = 1:num_algorithms
+        algo_name = algo_str(j).name;                
+        for jj = 1:num_params
+            mat_path = [src_dir case_name algo_name '_P' num2str(jj) '.mat']
+            full_fib_struct = load(mat_path);
+            if (j == 1 && display_on)
+                %open and display the image
+                %full_image = imread('Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\original_images\TACS-3a.tif');
+                full_image = imread('Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\original_images\04_25_12 Trentham DCIS 542805 -02.tif');
+                figure(1); hold off; imshow(full_image); hold on;
+            end
+                        
+            for k = 1:num_crops
+                disp(['crop number = ' int2str(k)]);
+                %these are the positions of the crops
+                x1 = case_struct(i).crop_x(k);
+                x2 = x1 + crop_w;
+                y1 = case_struct(i).crop_y(k);
+                y2 = y1 + crop_h;
+                %create a new fiber structure for fibers that are inside cropped region
+                crop_fib_ind = 0;
+                                              
+                num_fib = length(full_fib_struct.data.Fai);
+                complete_struct(str_idx).fiber_list = struct('indiv_fib_struct', []);
+                %loop through each fiber in entire structure
+                for m = 1:num_fib
+                    fib_len = 0;
+                    num_pts = length(full_fib_struct.data.Fai(m).v);
+                    %loop through all points in the fiber
+                    for n = 1:num_pts
+                        ind = full_fib_struct.data.Fai(m).v(n);
+                        %row_pt and col_pt are the positions in the full image
+                        row_pt = full_fib_struct.data.Xai(ind,2);
+                        col_pt = full_fib_struct.data.Xai(ind,1);
+                        if (row_pt >= y1 && row_pt <= y2 && col_pt >= x1 && col_pt <= x2)
 
-                %have we already entered this fiber into the new structure?
-                if (fib_len < 0)
-                    %start a new fiber and add the point                    
-                    indiv_fib_struct = struct('x', [], 'y', [], 'crop_pos_col', [], 'crop_pos_row', []);   
+                            %there is a point on this fiber that is in the cropped
+                            %region
+
+                            %have we already entered this fiber into the new structure?
+                            if (fib_len < 0)
+                                %start a new fiber and add the point                    
+                                indiv_fib_struct = struct('x', [], 'y', [], 'crop_pos_col', [], 'crop_pos_row', []);   
+                            end
+                            fib_len = fib_len + 1;
+                            indiv_fib_struct.x(fib_len) = col_pt; %position in full image
+                            indiv_fib_struct.y(fib_len) = row_pt;
+
+                            if (j == 1 && display_on)
+                                figure(1); plot(gca, col_pt, row_pt, 'o','MarkerSize',1,'MarkerEdgeColor','r');
+                            end
+                        end
+                    end
+                    if (fib_len > 0)
+                        %add fiber to collection of fibers in crop
+                        indiv_fib_struct.crop_pos_col = x1;
+                        indiv_fib_struct.crop_pos_row = y1;
+                        crop_fib_ind = crop_fib_ind + 1;
+                        %crop_struct(crop_fib_ind).indiv_fib_struct = indiv_fib_struct;
+                        complete_struct(str_idx).fiber_list(crop_fib_ind).indiv_fib_struct = indiv_fib_struct;
+                        clear('indiv_fib_struct');
+                    end
                 end
-                fib_len = fib_len + 1;
-                indiv_fib_struct.x(fib_len) = col_pt; %position in full image
-                indiv_fib_struct.y(fib_len) = row_pt;
+                complete_struct(str_idx).case_name = case_name;
+                complete_struct(str_idx).algo_name = algo_name;
+                complete_struct(str_idx).param_name = ['P' num2str(jj)];
+                complete_struct(str_idx).crop_name = ['crop' num2str(k)];
                 
-                if (j == 1 && display_on)
-                    figure(1); plot(gca, col_pt, row_pt, 'o','MarkerSize',1,'MarkerEdgeColor','r');
-                end
+                %these are used by the next program for relating manual to auto
+                complete_struct(str_idx).case_idx = i;
+                complete_struct(str_idx).algo_idx = j;
+                complete_struct(str_idx).param_idx = jj;
+                complete_struct(str_idx).crop_idx = k; 
+                str_idx = str_idx + 1; %structure index
             end
         end
-        if (fib_len > 0)
-            %add fiber to collection of fibers in crop
-            indiv_fib_struct.crop_pos_col = x1;
-            indiv_fib_struct.crop_pos_row = y1;
-            crop_fib_ind = crop_fib_ind + 1;
-            crop_struct(crop_fib_ind).indiv_fib_struct = indiv_fib_struct;
-            clear('indiv_fib_struct');
-        end
     end
-    %add crop struct to image
-    image_struct(k).crop_struct = crop_struct;
-    clear('crop_struct');
-    
 end
-%add crop struct to algo struct
-method_struct(j).image_struct = image_struct;
-clear('image_struct');
-end
-exp_struct(i).method_struct = method_struct;
-clear('method_struct');
-save('all_extracted_crops.mat','exp_struct');
-end
-%after done, save the new structure
-%save('all_extracted_crops.mat','exp_struct');
+%after done, save the whole structure
+save('all_extracted_crops.mat','complete_struct','num_cases','num_crops','num_params','num_algorithms');
