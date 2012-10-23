@@ -13,18 +13,24 @@ home
 path(path,'Z:\liu372\download\CurveLab-2.1.2\fdct_wrapping_matlab\'); % add serach path of the curvelet transform  
 
 
-
-iNF  = 19 % file name number to be analyzed
+iNF  = 8 %[7 21:24] % file name number to be analyzed
 
 % file directories possibly be used
 dir1 = 'D:\UW-MadisonSinceFeb_01_2012\download\testimages\';
 dir2 = 'D:\UW-MadisonSinceFeb_01_2012\download\testresults\';
 dir3 = 'D:\UW-MadisonSinceFeb_01_2012\download\testcontrols\';
 
-dir4 = 'Z:\liu372\fiberextraction\testoverlay\070212\';
-dir5 = 'Z:\liu372\fiberextraction\testimages\070512\';
-dir6 =  'Z:\liu372\fiberextraction\testresults\070512\';
-dir7 = 'Z:\liu372\fiberextraction\testcontrols\070512\';
+% dir4 = 'Z:\liu372\fiberextraction\testoverlay\070212\';
+% dir5 = 'Z:\liu372\fiberextraction\testimages\070512\';
+% dir6 =  'Z:\liu372\fiberextraction\testresults\070512\';
+% dir7 = 'Z:\liu372\fiberextraction\testcontrols\070512\';
+
+
+dir4 = 'Z:\liu372\fiberextraction\testoverlay\100812\';
+dir5 = 'Z:\liu372\fiberextraction\testimages\100812\';
+dir6 =  'Z:\liu372\fiberextraction\testresults\100812\';
+dir7 = 'Z:\liu372\fiberextraction\testcontrols\100812\';
+
 
 dir9 =  'Z:\liu372\fiberextraction\testtemp\';
 
@@ -33,7 +39,7 @@ fileN(2).name = 'N50L200AUniC.tif';              % simulated case
 fileN(3).name = 'Substack (110)_Kgel5.tif';
 fileN(4).name = '11250_SKOV_Substack (8).tif';           % 
 fileN(5).name = 'Substack (103)_tissue_SHG_J1.tif';       % size: 512 by 512, from Jeremy
-fileN(6).name = '12_30_08 Slide 1B-c7-01_C2.tiff';       % size: 512 by 512,BC,from Conklin
+fileN(6).name = '12_30_08 Slide 1B-c7-01_C2.tiff';       % size: 1024 by 1024,BC,from Conklin
 fileN(7).name = 'TACS-3a.tif';       % size: 600 by 600 ,BC, from Carolyn 
 fileN(8).name = 'TACS-3b.tif';       % size: 600 by 600, BC, from Carolyn
 fileN(9).name = 'R_62211_40x_2z_64mw_ser1_a1_angle000.tif';  % size: 512 by 512
@@ -47,7 +53,11 @@ fileN(16).name = '04_10_12 Trentham DCIS 543509 -02.tif'; % size:1024 by 1024,BC
 fileN(17).name = '04_11_12 Trentham DCIS 543509 -01.tif'; % size: 1024 by 1024,BC,from Conklin
 fileN(18).name = '04_11_12 Trentham DCIS 543654 -01.tif'; % size: 1024 by 1024,BC, from Conklin
 fileN(19).name = 'strained-center-1_C1_TP0_SP0_FW0.tiff'; % size: 512 by 512 from KristinRiching
-
+fileN(20).name = '04_25_12 Trentham DCIS 542805 -02 FW.tif';%  size: 1024 by 1024,BC, from Conklin
+fileN(21).name = '04_25_12 Trentham DCIS 542805 -02.tif';
+fileN(22).name = '04_25_12 Trentham DCIS 542805 -03.tif';
+fileN(23).name = '03_07_08 Slide 2B-f7-02_C2_wl.tif';
+fileN(24).name = '03_07_08 Slide 2B-g3-02_C2_wl.tif';
 
 % add scale or scale combination to be investigated
 if iNF == 19
@@ -82,7 +92,7 @@ for iN = iNF
 %    fctr = [dir1, sprintf('test%d-CTR.mat',iN)];  % filename of the curvelet transformed reconstructed image
    
 
-   figname = [dir1, fileN(iN).name];
+   figname = [dir5(1:end-7), fileN(iN).name];
 
 %    load(fname0);
 %    load(fname1,'angEALL','angIALL');
@@ -102,8 +112,9 @@ for iN = iNF
     
     % Forward curvelet transform
     disp('Take curvelet transform: fdct_wrapping');
-    tic; C = fdct_wrapping(double(IS),0); toc;
-
+%     tic; C = fdct_wrapping(double(IS),0); toc;
+    C = fdct_wrapping(double(IS),0);
+    
     % Get threshold value
     cfs =[];
     for s=1:length(C)
@@ -127,6 +138,7 @@ for iN = iNF
     
     for iNs =ssc 
         
+       disp(sprintf('reconstructing test%d,sc#%d of %d',iN, iNs, length(ssc))); 
        scN = scalesc(iNs).name;
         
     % create an empty cell array of the same dimensions
@@ -148,16 +160,24 @@ for iN = iNF
     for iS = s 
         Ct{iS} = C{iS};
     end
-    tic; Y = ifdct_wrapping(Ct,0); toc;
-    CTr = real(Y);
+%     tic; Y = ifdct_wrapping(Ct,0); toc;
+    Y = ifdct_wrapping(Ct,0); 
+
+   CTr = real(Y);
    figure(100+20*iN+iNs);clf
    set(gcf,'position',[50+20*iNs 50+20*iNs 512 256]);
-   subplot(1,2,1); colormap gray; imagesc(real(IS)); axis('image'); title('original image');
-   subplot(1,2,2); colormap gray; imagesc(real(CTr)); axis('image');
+   subplot(1,2,1); colormap gray; imagesc(IS); axis('image'); title('original image');
+   subplot(1,2,2); colormap gray; imagesc(CTr); axis('image');
    title(sprintf('partial reconstruction,%s',scN));
    
-   fctr = [dir5, sprintf('test%d-CTR%s.mat',iN,scN)];  % filename of the curvelet transformed reconstructed image
-   save(fctr,'CTr'); 
+   fctrsc = [dir5,'\ctsc_mult_params\', sprintf('test%d-CTR%s.mat',iN,scN)];  % filename of the curvelet transformed reconstructed image
+   CTscimg = [dir5, '\ctsc_mult_params\',sprintf('test%d_CTRimg%s.tif',iN,scN)];  % filename of the curvelet transformed reconstructed image
+
+   set(gcf,'PaperUnits','inches','PaperPosition',[0 0 2*pix/128 pix/128]);
+   print('-dtiff', '-r128', CTscimg);  % CT reconstructed image
+   
+   save(fctrsc,'CTr'); 
+%   pause
    
    home; disp(sprintf('scale combination  %s , of image %d', scN,iN));
 %    disp('Press any key to continue ...');pause 
