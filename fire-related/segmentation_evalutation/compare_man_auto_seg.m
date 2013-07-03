@@ -16,15 +16,21 @@
 %clc;
 
 plot_on = 0;
+plot_on2 = 0;
+%plotColor = [1 1 0];
 
 ang_thresh = 0.3;
-dist_thresh = 0.5; %relative to fiber length
+dist_thresh = .5; %relative to fiber length
 len_thresh = 2; %relative to fiber length
+
+%ang_thresh = 0.75;
+%dist_thresh = .5; %relative to fiber length
+%len_thresh = 2.5; %relative to fiber length
 
 %open the manual segmentation mat file
 
 %open the auto segmentation mat file
-auto_mat = load('all_extracted_crops.mat');
+auto_mat = load('all_extracted_crops_10.mat');
 %output file
 %out_fname = 'compare_man_auto_seg_out_jb.txt';
 %file_id = fopen(out_fname, 'w+');
@@ -41,13 +47,22 @@ num_images = auto_mat.num_cases;
 num_methods = auto_mat.num_algorithms;
 num_crops = auto_mat.num_crops;
 num_params = auto_mat.num_params;
-num_raters = 3;
+num_raters = 1;
 
 precision = zeros(num_raters,num_images,num_methods,num_params,num_crops);
 recall = zeros(num_raters,num_images,num_methods,num_params,num_crops);
 fmeas = zeros(num_raters,num_images,num_methods,num_params,num_crops);
 true_pos_rt = zeros(num_raters,num_images,num_methods,num_params,num_crops);
 false_pos_rt = zeros(num_raters,num_images,num_methods,num_params,num_crops);
+
+num_imgs = length(auto_mat.complete_struct);
+num_imgs = 25;
+over = zeros(1,num_imgs);
+under = zeros(1,num_imgs);
+hits = zeros(1,num_imgs);
+misses = zeros(1,num_imgs);
+fp = zeros(1,num_imgs);
+
 
 for r = 1:num_raters
     if r == 1
@@ -57,8 +72,8 @@ for r = 1:num_raters
     else
         man_mat = load('roi_mc.mat');
     end
-for i = 1:length(auto_mat.complete_struct)
-%for i = 1:25
+%for i = 1:length(auto_mat.complete_struct)
+for i = 1:25
     case_idx = auto_mat.complete_struct(i).case_idx;
     method_idx = auto_mat.complete_struct(i).algo_idx;
     param_idx = auto_mat.complete_struct(i).param_idx;
@@ -70,8 +85,13 @@ for i = 1:length(auto_mat.complete_struct)
     disp(auto_name);
     
     num_man_fibers = length(man_mat.rater_struct(man_idx).roi_struct);
-    num_auto_fibers = length(auto_mat.complete_struct(i).fiber_list);
-
+    
+    if (isempty(auto_mat.complete_struct(i).fiber_list(1).indiv_fib_struct))
+        num_auto_fibers = 0;
+    else
+        num_auto_fibers = length(auto_mat.complete_struct(i).fiber_list);
+    end
+    
     disp(['num_man_fibers = ' num2str(num_man_fibers)]);
     disp(['num_aut_fibers = ' num2str(num_auto_fibers)]);
     
@@ -84,7 +104,7 @@ for i = 1:length(auto_mat.complete_struct)
     assoc_arr_auto = zeros(1,num_auto_fibers);
 
     if (plot_on == 1)
-        figure(crop_idx); hold off;
+        figure(crop_idx*1000); hold off;
     end    
     
     %loop through the manual fibers
@@ -95,14 +115,14 @@ for i = 1:length(auto_mat.complete_struct)
         pts_y = man_mat.rater_struct(man_idx).roi_struct(m).ypoints;
 
         if (plot_on == 1)
-            figure(crop_idx); plot(pts_x,pts_y,'-*'); hold on;
+            figure(crop_idx*1000); plot(pts_x,pts_y,'-*'); hold on;
         end
 
-        [ang_array avg_ang std_ang ent_ang curvature] = avg_angle(pts_x, pts_y);
+        [ang_array avg_ang std_ang end_ang curvature curvature2] = avg_angle2(pts_x, pts_y);
 
         [len_array total_len] = fiber_length(pts_x, pts_y);
 
-        ang_arr_man(m) = avg_ang;
+        ang_arr_man(m) = end_ang;
         len_arr_man(m) = total_len;             
     end    
     
@@ -119,14 +139,14 @@ for i = 1:length(auto_mat.complete_struct)
         pts_y = auto_mat.complete_struct(i).fiber_list(m).indiv_fib_struct.y - offset_y;
 
         if (plot_on == 1)
-            figure(k); plot(pts_x,pts_y,'-or'); hold on;
+            figure(crop_idx*1000); plot(pts_x,pts_y,'-or'); hold on;
         end                
 
-        [ang_array avg_ang std_ang ent_ang curvature] = avg_angle(pts_x, pts_y);
+        [ang_array avg_ang std_ang end_ang curvature curvature2] = avg_angle2(pts_x, pts_y);
 
         [len_array total_len] = fiber_length(pts_x, pts_y);
 
-        ang_arr_auto(m) = avg_ang;
+        ang_arr_auto(m) = end_ang;
         len_arr_auto(m) = total_len;
     end    
     
@@ -179,8 +199,8 @@ for i = 1:length(auto_mat.complete_struct)
                             offset_y = auto_mat.complete_struct(i).fiber_list(n).indiv_fib_struct.crop_pos_row;
                             pts_x = auto_mat.complete_struct(i).fiber_list(n).indiv_fib_struct.x - offset_x;
                             pts_y = auto_mat.complete_struct(i).fiber_list(n).indiv_fib_struct.y - offset_y;                                    
-
                             figure(crop_idx*100); plot(pts_x,pts_y,'r');
+                            
                             disp(['ang_dif = ' num2str(ang_dif)]);
                             disp(['tot_dist = ' num2str(tot_dist)]);
                             disp(['len_dif = ' num2str(len_dif)]);                                    
@@ -198,11 +218,40 @@ for i = 1:length(auto_mat.complete_struct)
        overseg(r, case_idx, method_idx, param_idx, crop_idx)...
       underseg(r, case_idx, method_idx, param_idx, crop_idx)...
    true_pos_rt(r, case_idx, method_idx, param_idx, crop_idx)...
-  false_pos_rt(r, case_idx, method_idx, param_idx, crop_idx)] = comp_roc(assoc_arr_man, assoc_arr_auto, len_arr_man, len_arr_auto);    
-    disp('0000000000000000000000000');
+  false_pos_rt(r, case_idx, method_idx, param_idx, crop_idx)] = comp_roc(assoc_arr_man, assoc_arr_auto, len_arr_man, len_arr_auto);
+    
+    over(i) = nansum(assoc_arr_man)/nansum(assoc_arr_man>0);
+    under(i) = nansum(assoc_arr_auto)/nansum(assoc_arr_auto>0);
+    hits(i) = nansum(assoc_arr_man > 0);
+    misses(i) = nansum(assoc_arr_man == 0);
+    fp(i) = nansum(assoc_arr_auto == 0);
+%     disp(['over = ' num2str(over)]);
+%     disp(['under = ' num2str(under)]);
+%     disp(['hits = ' num2str(hits)]);
+%     disp(['misses = ' num2str(misses)]);
+%     disp(['FP = ' num2str(fp)]);
+    disp('0000000000000000000000000');    
+    
+    %pause;
+    
+    
+    
 end
 %save here to get the results before it's all over, in case I want to quit
 save('compare_results.mat','precision','recall','fmeas','overseg','underseg','true_pos_rt','false_pos_rt');
+end
+
+if (plot_on2)
+    figure(1); hold all;
+    plot(1:25,over,'-*'); title('over');
+    figure(2); hold all;
+    plot(1:25,under,'-*');title('under');
+    figure(3); hold all;
+    plot(1:25,hits,'-*'); title('hits');
+    figure(4); hold all;
+    plot(1:25,misses,'-*'); title('misses');
+    figure(5); hold all;
+    plot(1:25,fp,'-*'); title('false pos');
 end
 
 %save('compare_results.mat','precision','recall','fmeas','overseg','underseg','true_pos_rt','false_pos_rt');

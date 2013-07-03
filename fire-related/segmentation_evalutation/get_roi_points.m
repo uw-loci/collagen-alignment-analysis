@@ -20,6 +20,19 @@ floatPoly = baseRoi.getFloatPolygon();
 npoints = floatPoly.npoints;
 xpoints = floatPoly.xpoints;
 ypoints = floatPoly.ypoints;
+total_seg_pts = [];
+
+for i = 1:npoints-1
+    pt1 = [ypoints(i) xpoints(i)];
+    pt2 = [ypoints(i+1) xpoints(i+1)];
+    
+    [seg_pts, ~] = GetSegPixels( pt1, pt2 );
+    total_seg_pts = [total_seg_pts; seg_pts];
+end
+
+npoints = length(total_seg_pts);
+ypoints = total_seg_pts(:,1);
+xpoints = total_seg_pts(:,2);
 
 %MIJ.exit
 

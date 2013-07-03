@@ -8,6 +8,9 @@ close all;
 %clc;
 display_on = 0;
 
+%only extract at fibers longer than this
+length_thresh = 10; %pixels
+
 %cases (order really matters)
 num_cases = 5; %full images
 num_crops = 5; %cropped out regions from each image
@@ -146,6 +149,10 @@ for i = 1:num_cases
                     fib_len = 0;
                     num_pts = length(full_fib_struct.data.Fai(m).v);
                     %loop through all points in the fiber
+                    if (num_pts < length_thresh)
+                        continue; %save time if fiber is already too short
+                    end
+                    
                     for n = 1:num_pts
                         ind = full_fib_struct.data.Fai(m).v(n);
                         %row_pt and col_pt are the positions in the full image
@@ -157,7 +164,7 @@ for i = 1:num_cases
                             %region
 
                             %have we already entered this fiber into the new structure?
-                            if (fib_len < 0)
+                            if (fib_len == 0)
                                 %start a new fiber and add the point                    
                                 indiv_fib_struct = struct('x', [], 'y', [], 'crop_pos_col', [], 'crop_pos_row', []);   
                             end
@@ -170,7 +177,7 @@ for i = 1:num_cases
                             end
                         end
                     end
-                    if (fib_len > 0)
+                    if (fib_len > length_thresh) %check if fiber that is in crop is too short (cut off at edge maybe)
                         %add fiber to collection of fibers in crop
                         indiv_fib_struct.crop_pos_col = x1;
                         indiv_fib_struct.crop_pos_row = y1;

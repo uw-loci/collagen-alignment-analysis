@@ -5,6 +5,15 @@ function [ ang_array avg_ang std_ang ent_ang curvature ] = avg_angle( x, y )
 % x is a 1Xn array of column positions, length should be > 1
 % y is a 1Xn array of row positions, length should be > 1
 
+
+% ideas:
+% may want to fit a line to the points and measure angle of best fit line
+% compute angle of line connecting end points
+% weight each segment equally (no length info) to generate the mean of angles present in the fiber
+% compute the resultant vector after all segments weigh in equally (no length)
+% compute variance and standard deviation
+
+
 len_x = length(x);
 len_y = length(y);
 

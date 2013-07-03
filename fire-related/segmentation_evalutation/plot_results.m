@@ -1,47 +1,149 @@
 
+%Used for plotting the output of the segmentation comparison
+%Jeremy Bredfeldt 10/12/12
+
+%Dimensional legend for the results matrix:
+%raters, images, algorithms, parameters, crops
+
 function [] = plot_results()
-    close all;
+    %close all;
     clear all;
 
-    comp_results = load('compare_results.mat');
-
-    %raters, images, algorithms, parameters, crops
-    [fmeas, fmeasStd] = comp_stats(comp_results.fmeas);
-    [recall, recallStd] = comp_stats(comp_results.recall);
-    [prec, precStd] = comp_stats(comp_results.precision);
+    comp_results = load('compare_results_10.mat');
+    
+    [fmeas, fmeasStd, fmeasMax, fmeasMaxStd, fmeasMaxIdx] = comp_stats2(comp_results.fmeas);
+    [recall, recallStd, recallMax, recallMaxStd, recallMaxIdx] = comp_stats2(comp_results.recall);
+    [prec, precStd, precMax, precMaxStd, precMaxIdx] = comp_stats2(comp_results.precision);
     
     figure(1);
-    barwitherr(fmeasStd',fmeas');
+    barwitherr(fmeasStd,fmeas);
     title('Fmeasure');
     legend('CT','TF','STV','GF');
     xlabel('Parameter Settings');
     ylim([0 .35]);
     
     figure(2);
-    barwitherr(recallStd',recall');
+    barwitherr(recallStd,recall);
     title('Recall');
     legend('CT','TF','STV','GF');
     xlabel('Parameter Settings');
     ylim([0 .6]);
     
     figure(3);
-    barwitherr(precStd',prec');
+    barwitherr(precStd,prec);
     title('Precision');    
     legend('CT','TF','STV','GF');
     xlabel('Parameter Settings');
     ylim([0 .3]);
+    
+    bestResults = vertcat(fmeasMax,recallMax,precMax);
+    bestStd = vertcat(fmeasMaxStd, recallMaxStd, precMaxStd);
+    figure(4);
+    barwitherr(bestStd,bestResults);
+    legend('CT','TF','STV','GF');
+    set(gca,'xticklabel',{'Fmeas','Recall','Precision'});
+    ylim([0 .55]);
+    
+%     %compare results for each image
+%     [avg, stdDev] = comp_for_each_image(comp_results.fmeas);
+%     figure(5);
+%     barwitherr(stdDev,avg);
+%     title('Fmeasure');
+%     set(gca,'xticklabel',{'test07','test21','test22','test23','test24'});
+%     legend('CT','TF','STV','GF');
+%     
+%     
+%     [avg, stdDev] = comp_for_each_image(comp_results.recall);
+%     figure(6);
+%     barwitherr(stdDev,avg);
+%     title('Recall');
+%     set(gca,'xticklabel',{'test07','test21','test22','test23','test24'});
+%     legend('CT','TF','STV','GF');
+%     
+%     [avg, stdDev] = comp_for_each_image(comp_results.precision);
+%     figure(7);
+%     barwitherr(stdDev,avg);
+%     title('Precision');
+%     set(gca,'xticklabel',{'test07','test21','test22','test23','test24'});
+%     legend('CT','TF','STV','GF');    
 end
 
-function [avg, stdDev] = comp_stats(input_array)
-    %average over crops
-    avgCrops = squeeze(nansum(input_array(:,:,:,:,:),5)/5);
-    %average over images
-    avgImgs = squeeze(nansum(avgCrops(:,:,:,:),2)/5);
-    %average over raters
-    avg = squeeze(nansum(avgImgs(:,:,:),1)/3);
+function [avg, stdDev, maxAvg, maxStd maxIdx] = comp_stats(input_array)
+    %raters, images, algorithms, parameters, crops
 
+    %average over crops
+    avgCrops = squeeze(nansum(input_array,5)/5);
+    %average over images
+    avgImgs = squeeze(nansum(avgCrops,2)/5);
+    %average over raters
+    avgRaters = squeeze(nansum(avgImgs,1)/3);
+
+    %Get the max of the results over parameters for each algorithm
+    [maxAvg, maxIdx] = max(avgRaters,[],2);
+    maxAvg = maxAvg';
+    %maxAvg is the best performance result
+    %maxIdx indicates which parameter has the best performance
+    
     %get standard deviation over raters
-    stdDev = squeeze(std(avgImgs,1,1));
+    stdDevRaters = squeeze(std(avgImgs,1,1));
+    
+    %get the standard deviations for the best parameters
+    linIdx = sub2ind(size(stdDevRaters),1:size(stdDevRaters,1),maxIdx');
+    maxStd = stdDevRaters(linIdx);
+    
+    %transpose helps with plotting, no other reason to transpose here
+    avg = avgRaters';
+    stdDev = stdDevRaters';
+    
+end
+
+function [avg, stdDev] = comp_for_each_image(input_array)
+    %average over crops
+    avgCrops = squeeze(nansum(input_array,5)/5);
+    %get max over parameters
+    maxParams = max(avgCrops,[],4);
+    %average over raters
+    avgRaters = squeeze(nansum(maxParams,1)/3);
+    
+    %get standard deviation over raters
+    stdDevRaters = squeeze(std(maxParams,1,1));    
+    
+    avg = avgRaters;
+    stdDev = stdDevRaters;
+    
+end
+
+function [avg, stdDev, maxAvg, maxStd maxIdx] = comp_stats2(input_array)
+    %raters, images, algorithms, parameters, crops
+    
+    %discard mc and cases 23 and 24
+    
+    input_array = input_array(1:3,1:3,:,:,:);
+
+    %average over crops
+    avgCrops = squeeze(nansum(input_array,5)/5);
+    %average over images
+    avgImgs = squeeze(nansum(avgCrops,2)/3);
+    %average over raters
+    avgRaters = squeeze(nansum(avgImgs,1)/3);
+
+    %Get the max of the results over parameters for each algorithm
+    [maxAvg, maxIdx] = max(avgRaters,[],2);
+    maxAvg = maxAvg';
+    %maxAvg is the best performance result
+    %maxIdx indicates which parameter has the best performance
+    
+    %get standard deviation over raters
+    stdDevRaters = squeeze(std(avgImgs,1,1));
+    
+    %get the standard deviations for the best parameters
+    linIdx = sub2ind(size(stdDevRaters),1:size(stdDevRaters,1),maxIdx');
+    maxStd = stdDevRaters(linIdx);
+    
+    %transpose helps with plotting, no other reason to transpose here
+    avg = avgRaters';
+    stdDev = stdDevRaters';
+    
 end
 
 function barwitherr(errors,varargin)

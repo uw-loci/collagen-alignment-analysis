@@ -11,8 +11,11 @@ clear all;
 close all;
 clc;
 
-iJ_top_dir = 'Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\ROI_Conklin\unzipped\';
-out_name = '.\roi_mc2.mat';
+%iJ_top_dir = 'Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\ROI_Conklin\unzipped\';
+%iJ_top_dir = 'Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\ROI_JB\unzipped\';
+iJ_top_dir = 'Z:\liu372\fiberextraction\testimages\073112\test_image_annotation\ROI_YM\unzipped\';
+
+out_name = '.\roi_ym2.mat';
 
 case_list = dir(iJ_top_dir);
 
