@@ -6,21 +6,21 @@
 
 clear;clc;home;
 pd1 = pwd;
-pd2 = 'Z:\liu372\images\HuBrImages\ctFIREout\';
-pd3 = 'E:\images\forJBOrevision\ctFIREout\results1\';
+%pd2 = 'Z:\liu372\images\HuBrImages\ctFIREout\';
+%pd3 = 'E:\images\forJBOrevision\ctFIREout\results1\';
 % pd4 = 'Z:\liu372\images\forJBOrevision\orginalimages2\imagetobeprocessed\ctFIREout3\';
 % pd4 = 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\imagecrops\ctFIREout\';
 % pd4 = 'Z:\liu372\images\forJBOrevision\imagecrops\';
 % pd5 = [pd4,'ctFIREout2\'];
 % pd4= 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\m0820\';
 % pd4 = 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\imagecrops\';
-pd4= 'E:\images\forJBOrevision\071913_analysis\images_analyzed\';
+pd4= 'E:\Images\071913_analysis\images_analyzed\';
 pd5 = [pd4 'ctFIREout\'];
 
 
 %OUT1 = dir([pd2,'ctFIREout_NAT*.mat']);
 %OUT2 = dir([pd2,'ctFIREout_IDC*.mat']);
-OUT3 = dir([pd3, 'ctFIREout*crop1.mat']);
+%OUT3 = dir([pd3, 'ctFIREout*crop1.mat']);
 OUT4 = dir([pd4,'*.tif']);
 OUT5 = dir([pd5,'ctFIREout*.mat']);
 
@@ -68,21 +68,32 @@ for i = 1:filenum
     strt_mean_arr(i) = median(strt);
     strt_std_arr(i) = std(strt);
     
+    
     %organize data into features and labels for SVM:
     lens_all = data.M.L(FN); %lengths of the included fibers
     last_idx = first_idx+LFa-1;
     feature_set(first_idx:last_idx,1) = strt;
-    feature_set(first_idx:last_idx,2) = lens_all;
+    feature_set(first_idx:last_idx,2) = lens_all.*strt;
     if i >= 1 && i <=3 
-        label_set(first_idx:last_idx) = 'E';
+        label_set(first_idx:last_idx) = 'E';        
+    elseif i > 3 && i <= 6
+        label_set(first_idx:last_idx) = 'L';
     else
         label_set(first_idx:last_idx) = 'L';
     end
     first_idx = last_idx+1;
     
+    if i == 3
+        tp1_end = last_idx;
+    elseif i == 6
+        tp2_end = last_idx;
+    elseif i == 9
+        tp3_end = last_idx;
+    end
+    
 %     figure(40+i);clf
-%      hist(strt,binc);
-%      axis([0.5 1.0 0 100])
+%     hist(strt,binc);
+%     axis([0.5 1.0 0 100])
          
     if plotflag == 1
         rng(1001) ;
@@ -144,7 +155,7 @@ bar(wfratmean,0.5);
 hold on;
 h2 = errorbar(wfratmean,wfratstd);
 set(h2,'color','r','linestyle','none','linewidth',4);
-set(gca,'XTickLabel',{'Day 1', 'Day 8', 'Day 25'})
+set(gca,'XTickLabel',{'Day 1', 'Day 8', 'Day 25'});
 title('Wavy fiber percentage','fontsize',fz);
 xlabel('Imaging date','fontsize',fz);
 ylabel('Percentage(%)','fontsize',fz)
@@ -161,6 +172,26 @@ figure(12); clf;
 svmStruct = svmtrain(feature_set,label_set','showplot',true);
 xlabel('Straightness');
 ylabel('Length');
+
+figure(13); clf;
+barwitherr([wfnumstd(1) wfnumstd(3)], [wfnummean(1) wfnummean(3)],0.5,'r');
+set(gca,'XTickLabel',{'8 Weeks', '12 Weeks'});
+
+figure(14); clf;
+barwitherr([wfratstd(1) wfratstd(3)], [wfratmean(1) wfratmean(3)],0.5,'FaceColor',[.5 .5 .5],'LineWidth',2);
+set(gca,'XTickLabel',{'8 Weeks', '12 Weeks'});
+%title('Wavy fiber percentage','fontsize',fz);
+xlabel('Time Point','fontsize',fz);
+ylabel('Wavy fiber fraction','fontsize',fz);
+set(gca,'LineWidth',2,'FontSize',fz);
+
+figure(15); clf;
+str_tp1m = mean(strt_mean_arr(1:3));
+str_tp1s = std(strt_mean_arr(1:3)); %incorrect propagation of error
+str_tp2m = mean(strt_mean_arr(7:9));
+str_tp2s = std(strt_mean_arr(7:9)); %incorrect propagation of error
+barwitherr([str_tp1s str_tp2s], [str_tp1m str_tp2m]);
+set(gca,'XTickLabel',{'8 Weeks', '12 Weeks'});
 
 break
 

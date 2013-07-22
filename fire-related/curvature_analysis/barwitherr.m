@@ -96,8 +96,8 @@ elseif isvector(values)~=isvector(errors)
     lowerErrors = errors(:,1);
     upperErrors = errors(:,2);
 else
-    lowerErrors = errors(:,1);
-    upperErrors = errors(:,1);
+    lowerErrors = errors;
+    upperErrors = errors;
 end
 
     
@@ -121,12 +121,14 @@ if nRows > 1
         % errorbars will now be centred on each bar; these are in ascending
         % order so use xOrder to ensure y values and errors are too:
         hErrorbar(col) = errorbar(mean(x,1), values(xOrder,col), lowerErrors(xOrder,col), upperErrors(xOrder, col), '.k');
-        set(hErrorbar(col), 'marker', 'none')
+        %set(hErrorbar(col), 'marker', 'none', 'LineWidth', 2)
+        set(hErrorbar, 'LineWidth', 2);
     end
 else
     x = get(get(handles.bar,'children'),'xdata');
     hErrorbar = errorbar(mean(x,1), values, lowerErrors, upperErrors, '.k');
-    set(hErrorbar, 'marker', 'none')
+    %set(hErrorbar, 'marker', 'none', 'LineWidth', 2)
+    set(hErrorbar, 'LineWidth', 2);
 end
 
 hold off
