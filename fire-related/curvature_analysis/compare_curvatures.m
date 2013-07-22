@@ -7,19 +7,19 @@
 clear;clc;home;
 pd1 = pwd;
 pd2 = 'Z:\liu372\images\HuBrImages\ctFIREout\';
-pd3 = 'Z:\liu372\images\forJBOrevision\ctFIREout\results1\';
+pd3 = 'E:\images\forJBOrevision\ctFIREout\results1\';
 % pd4 = 'Z:\liu372\images\forJBOrevision\orginalimages2\imagetobeprocessed\ctFIREout3\';
 % pd4 = 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\imagecrops\ctFIREout\';
 % pd4 = 'Z:\liu372\images\forJBOrevision\imagecrops\';
 % pd5 = [pd4,'ctFIREout2\'];
 % pd4= 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\m0820\';
 % pd4 = 'C:\CAA_x220\github\curveletsbak\ctFIRE\jboimages\imagecrops\';
-pd4= 'Z:\liu372\images\forJBOrevision\071913_analysis\images_analyzed\';
+pd4= 'E:\images\forJBOrevision\071913_analysis\images_analyzed\';
 pd5 = [pd4 'ctFIREout\'];
 
 
-OUT1 = dir([pd2,'ctFIREout_NAT*.mat']);
-OUT2 = dir([pd2,'ctFIREout_IDC*.mat']);
+%OUT1 = dir([pd2,'ctFIREout_NAT*.mat']);
+%OUT2 = dir([pd2,'ctFIREout_IDC*.mat']);
 OUT3 = dir([pd3, 'ctFIREout*crop1.mat']);
 OUT4 = dir([pd4,'*.tif']);
 OUT5 = dir([pd5,'ctFIREout*.mat']);
