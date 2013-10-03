@@ -74,20 +74,20 @@ for i = 1:filenum
     last_idx = first_idx+LFa-1;
     feature_set(first_idx:last_idx,1) = strt;
     feature_set(first_idx:last_idx,2) = lens_all.*strt;
-    if i >= 1 && i <=3 
+    if i >= 1 && i <=9 
         label_set(first_idx:last_idx) = 'E';        
-    elseif i > 3 && i <= 6
+    elseif i > 9 && i <= 12
         label_set(first_idx:last_idx) = 'L';
     else
         label_set(first_idx:last_idx) = 'L';
     end
     first_idx = last_idx+1;
     
-    if i == 3
+    if i == 9
         tp1_end = last_idx;
-    elseif i == 6
+    elseif i == 12
         tp2_end = last_idx;
-    elseif i == 9
+    elseif i == 21
         tp3_end = last_idx;
     end
     
@@ -128,11 +128,11 @@ for i = 1:filenum
 end
 
 
-wfnummean = [mean(wfnum(1:3)) mean(wfnum(4:6)) mean(wfnum(7:9))];
-wfratmean = [mean(wfrat(1:3)) mean(wfrat(4:6)) mean(wfrat(7:9))];
+wfnummean = [mean(wfnum(1:9)) mean(wfnum(10:12)) mean(wfnum(13:21))];
+wfratmean = [mean(wfrat(1:9)) mean(wfrat(10:12)) mean(wfrat(13:21))];
 
-wfnumstd = [std(wfnum(1:3)) std(wfnum(4:6)) std(wfnum(7:9))];
-wfratstd = [std(wfrat(1:3)) std(wfrat(4:6)) std(wfrat(7:9))];
+wfnumstd = [std(wfnum(1:9)) std(wfnum(10:12)) std(wfnum(13:21))];
+wfratstd = [std(wfrat(1:9)) std(wfrat(10:12)) std(wfrat(13:21))];
 
 
 wf1 = [wfnum;wfrat];
@@ -178,12 +178,17 @@ barwitherr([wfnumstd(1) wfnumstd(3)], [wfnummean(1) wfnummean(3)],0.5,'r');
 set(gca,'XTickLabel',{'8 Weeks', '12 Weeks'});
 
 figure(14); clf;
-barwitherr([wfratstd(1) wfratstd(3)], [wfratmean(1) wfratmean(3)],0.5,'FaceColor',[.5 .5 .5],'LineWidth',2);
+fz = 48;
+barwitherr([wfratstd(1) wfratstd(3)], [wfratmean(1) wfratmean(3)],0.25,'FaceColor',[.5 .5 .5],'LineWidth',2);
 set(gca,'XTickLabel',{'8 Weeks', '12 Weeks'});
+set(gca,'YTick',[0 0.25 0.5 0.75 1.0])
+%set(gca,'YTickLabel',{'0', '0.5', '1.0'});
 %title('Wavy fiber percentage','fontsize',fz);
 xlabel('Time Point','fontsize',fz);
-ylabel('Wavy fiber fraction','fontsize',fz);
+ylabel('Wavy Fraction','fontsize',fz);
 set(gca,'LineWidth',2,'FontSize',fz);
+ylim([0.0 0.8]);
+%set(gca
 
 figure(15); clf;
 str_tp1m = mean(strt_mean_arr(1:3));
