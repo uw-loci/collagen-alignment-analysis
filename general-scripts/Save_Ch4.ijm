@@ -28,7 +28,7 @@ for (i = 0; i < list.length; i=i+1)
 		save(dir+"/HE/"+substring(fn,0,lengthOf(fn)-4)+"_HE.tif");
 		selectWindow("C4-"+fn);
 		run("Grays");
-		save(dir+"/SHG/"+substring(fn,0,lengthOf(fn)-4)+"_SHG.tif");
+		save(dir+"/SHG/"+substring(fn,0,lengthOf(fn)-4)+".tif");
 		run("Close All");
 	}
 
