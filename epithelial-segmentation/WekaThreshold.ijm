@@ -11,35 +11,40 @@ if (n==0){
 }
 
 //dir1 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part1\\";
-dir1 = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part1_try3\\";
+dir1 = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part1_try4\\";
 list1 = getFileList(dir1);
 //dir2 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\Slide 1B\\Slide 1B\\"
 dir2 = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\";
 list2 = getFileList(dir2);
 //outpath = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part2\\";
-outpath = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part2_try3\\";
+outpath = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part2_try4A\\";
 
 for (k = 0; k <  list1.length; k = k + 1)
-//for (k = 0; k < 1; k = k + 1)
+//for (k = 7; k < 9; k = k + 1)
 {
 	name = list1[k];
-	open(dir1 + name,1); //only open first image	
+	open(dir1 + name,1); //only open first image
+	
 	name = replace(name,'_HE',''); //remove _HE from the filename
-	run("Gaussian Blur...", "sigma=2");
-	setThreshold(0.6, 1.0);
+	run("Gaussian Blur...", "sigma=6");
+	
+	setThreshold(0.20, 1.0);
 	run("Create Mask");
+	//return;
 	//run("Invert");
 	//run("Invert LUT");
-	run("Analyze Particles...", "size=100-Infinity circularity=0.00-1.00 show=Masks include");	
+	run("Analyze Particles...", "size=0-Infinity circularity=0.00-1.00 show=Masks include");	
 	//return;
 	run("Gaussian Blur...", "sigma=16");
-	setThreshold(2, 255);
+	setThreshold(40, 255);
 	//return;
 	run("Create Mask");
-	run("Analyze Particles...", "size=100-Infinity circularity=0.00-1.00 show=Masks include");
+	
+	run("Analyze Particles...", "size=50-Infinity circularity=0.00-1.00 show=Masks");
+	//return;
 	//run("Convert to Mask", "method=Default");	
 	rename("epithelial_clusters");	
-	
+	//return;
 	//run("Duplicate...", "title=[epithelial_skeleton]");
 	//run("Skeletonize (2D/3D)");
 	//run("Invert LUT");
@@ -65,6 +70,7 @@ for (k = 0; k <  list1.length; k = k + 1)
 	run("RGB Color");
 	save(outpath+"weka_epithelial_over_"+name);
 	wait(100);
+	//return;
 	run("Close All");
 }
 
