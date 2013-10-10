@@ -1,23 +1,23 @@
 
 run("Close All");
 
-for (n = 0; n < 2; n=n+1)
-{
+//for (n = 0; n < 2; n=n+1)
+//{
 	
-if (n==0){
-	np = "Pos";	
-} else {
-	np = "Neg";
-}
+//if (n==0){
+//	np = "Pos";	
+//} else {
+//	np = "Neg";
+//}
 
 //dir1 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part1\\";
-dir1 = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part1_try4\\";
+dir1 = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\epithelialSeg\\part1_try4\\";
 list1 = getFileList(dir1);
 //dir2 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\Slide 1B\\Slide 1B\\"
-dir2 = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\";
+dir2 = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\";
 list2 = getFileList(dir2);
 //outpath = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part2\\";
-outpath = "P:\\Conklin data - Invasive tissue microarray\\TrainingSets20131004\\T"+np+"\\HE\\part2_try4A\\";
+outpath = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\epithelialSeg\\part2_try4\\";
 
 for (k = 0; k <  list1.length; k = k + 1)
 //for (k = 7; k < 9; k = k + 1)
