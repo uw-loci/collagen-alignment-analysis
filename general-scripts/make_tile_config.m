@@ -1,13 +1,13 @@
 clear all;
 close all;
 
-num_x = 85;
-num_y = 20;
+num_x = 64;
+num_y = 12;
 
 fname = sprintf('TileConfiguration_%0.2f.txt',cputime);
 fid = fopen(fname,'w+');
 
-fname_base = sprintf('Z:\\bredfeldt\\CAMM_Bredfeldt\\20130813_TMA1B\\R8-10\\WL\\ff\\ff_WL_1B_R8_10_C0');
+fname_base = sprintf(['D:\\CAMM_ovary\\20140311_OvTMA2\\row3_5\\HE\\ff\\ff_ovTMA_HE_C0']);
 
 %fname_base = sprintf('ff_2B_WL_C0');
 
@@ -20,9 +20,9 @@ fprintf(fid,'# Define the image coordinates\r\n');
 
 posx = 0.0;
 posy = 0.0;
-rotx = 0.25;
-roty = 1.0;
-shft = 323;
+rotx = 0;
+roty = 0;
+shft = 340;
 sp = 0;
 
 for y = 1:num_y
