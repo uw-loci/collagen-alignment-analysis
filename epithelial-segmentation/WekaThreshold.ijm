@@ -11,13 +11,13 @@ run("Close All");
 //}
 
 //dir1 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part1\\";
-dir1 = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\epithelialSeg\\part1_try4\\";
+dir1 = "D:\\Keikhosravi\\Mouse Pics\\Tumors\\JPI_Process\\HE\\part1\\";
 list1 = getFileList(dir1);
 //dir2 = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\Slide 1B\\Slide 1B\\"
-dir2 = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\";
+dir2 = "D:\\Keikhosravi\\Mouse Pics\\Tumors\\JPI_Process\\HE\\";
 list2 = getFileList(dir2);
 //outpath = "Z:\\bredfeldt\\Conklin data - Invasive tissue microarray\\FijiResults\\Segmentation\\Weka\\results_1B_part2\\";
-outpath = "D:\\bredfeldt\\ConklinAJP\\Originals\\HE\\epithelialSeg\\part2_try4\\";
+outpath = "D:\\Keikhosravi\\Mouse Pics\\Tumors\\JPI_Process\\HE\\part2\\";
 
 for (k = 0; k <  list1.length; k = k + 1)
 //for (k = 7; k < 9; k = k + 1)
@@ -74,4 +74,3 @@ for (k = 0; k <  list1.length; k = k + 1)
 	run("Close All");
 }
 
-}

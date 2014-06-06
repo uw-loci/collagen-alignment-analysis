@@ -12,10 +12,13 @@ rename("ff");
 run("Split Channels");
 //compute mean of r, g, & b
 selectWindow("ff (red)");
+run("Gaussian Blur...", "sigma=15");
 getStatistics(area,meanR);
 selectWindow("ff (green)");
+run("Gaussian Blur...", "sigma=15");
 getStatistics(area,meanG);
 selectWindow("ff (blue)");
+run("Gaussian Blur...", "sigma=15");
 getStatistics(area,meanB);
 
 list = getFileList(dir);
