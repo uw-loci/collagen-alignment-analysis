@@ -84,3 +84,8 @@ for i = 1:numSections
     end            
 end
 
+for i = 1:imw
+    imgA = img(:,i,:);
+    imgB = flipud(fliplr(imgA));
+    
+end
