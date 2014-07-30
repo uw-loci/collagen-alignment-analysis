@@ -27,6 +27,7 @@ imh = info.Height;
 
 imw2 = round(imw/2);
 imh2 = round(imh/2);
+ns2 = round(numSections/2);
 
 %pixel widths
 pwx = 0.07; %microns/pixel
@@ -48,12 +49,13 @@ end
 
 init = 0;
 %X & Y autocorr
-for i = 1:numSections
+%for i = 1:numSections
+for i = 1:28
     %figure(1);
     imgA = img(:,:,i);
     imgB = flipud(fliplr(imgA));          
     
-    %only accumulate if there is data in image
+    %only calc if there is data in image
     if mean(mean(imgA)) > 5
         %use convn to get autocorr
         cc = convn(imgA,imgB,'same');
@@ -83,9 +85,33 @@ for i = 1:numSections
         xlabel('microns');
     end            
 end
-
+%%
+init = 0;
 for i = 1:imw
-    imgA = img(:,i,:);
+    imgA = squeeze(img(:,i,:));
     imgB = flipud(fliplr(imgA));
+    
+    %only accumulate if there is data in image
+    if mean(mean(imgA)) > 5
+        %use convn to get autocorr
+        cc = convn(imgA,imgB,'same');
+        if init == 0
+            %init filter          
+            %Z = column
+            zc = cc(imw2,:);
+            init = 1;
+        else
+            %IIR filter autocorrelation
+            %Z = column
+            zc = 0.5*cc(imw2,:) + 0.5*zc;
+        end
+        i
+
+        figure(3);
+        plot(zvec,zc);
+        title('z-dir autocorr');
+        xlabel('microns');
+    end  
+            
     
 end
