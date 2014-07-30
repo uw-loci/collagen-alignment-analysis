@@ -45,73 +45,113 @@ for i = 1:numSections
     img(:,:,i) = imread(ff,i,'Info',info);
 end
 
-
-
-init = 0;
-%X & Y autocorr
-%for i = 1:numSections
-for i = 1:28
-    %figure(1);
-    imgA = img(:,:,i);
-    imgB = flipud(fliplr(imgA));          
-    
-    %only calc if there is data in image
-    if mean(mean(imgA)) > 5
-        %use convn to get autocorr
-        cc = convn(imgA,imgB,'same');
-        if init == 0
-            %init filter
-            %X = row
-            xc = cc(imh2,:);
-            %Y = column
-            yc = cc(:,imw2);
-            init = 1;
-        else
-            %IIR filter autocorrelation
-            %X = row
-            xc = 0.5*cc(imh2,:) + 0.5*xc;
-            %Y = column
-            yc = 0.5*cc(:,imw2) + 0.5*yc;
-        end
-        i
-        figure(1);
-        plot(xvec,xc);
-        title('x-dir autocorr');
-        xlabel('microns');
-
-        figure(2);
-        plot(yvec,yc);
-        title('y-dir autocorr');
-        xlabel('microns');
-    end            
-end
 %%
-init = 0;
-for i = 1:imw
-    imgA = squeeze(img(:,i,:));
-    imgB = flipud(fliplr(imgA));
-    
-    %only accumulate if there is data in image
-    if mean(mean(imgA)) > 5
-        %use convn to get autocorr
-        cc = convn(imgA,imgB,'same');
-        if init == 0
-            %init filter          
-            %Z = column
-            zc = cc(imw2,:);
-            init = 1;
-        else
-            %IIR filter autocorrelation
-            %Z = column
-            zc = 0.5*cc(imw2,:) + 0.5*zc;
-        end
-        i
+thr = 30; %mean grey level threshold for analysis
 
-        figure(3);
-        plot(zvec,zc);
-        title('z-dir autocorr');
-        xlabel('microns');
-    end  
-            
-    
+%iterate in z
+for i = 1:numSections
+    n = 1;
+    clear fvect;
+    %iterate in y (rows)
+    for j = 1:imw
+        A = squeeze(img(j,:,i));
+        B = fliplr(A);
+        if mean(A) > thr
+            cc = convn(A,B,'same');
+            figure(1);
+            plot(cc); hold all;
+            [f, lhv, rhv] = findFWHM(cc);
+            fvect(n) = f; %store all the fwhm values
+            n = n+1;
+            plot(lhv(1),lhv(2),'o');
+            plot(rhv(1),lhv(2),'o'); hold off;
+        end        
+    end
+    i
+    if exist('fvect')
+        disp(mean(fvect)*pwx);
+        disp(std(fvect)*pwx);
+    end
 end
+
+%iterate in x
+for i = 1:imh
+    n = 1;
+    clear fvect;
+    %iterate in y (rows)
+    for j = 1:imw
+        A = squeeze(img(j,i,:))';
+        B = fliplr(A);
+        if mean(A) > thr
+            cc = convn(A,B,'same');
+            figure(1);
+            plot(cc); hold all;
+            [f, lhv, rhv] = findFWHM(cc);
+            fvect(n) = f; %store all the fwhm values
+            n = n+1;
+            plot(lhv(1),lhv(2),'o');
+            plot(rhv(1),lhv(2),'o'); hold off;
+        end        
+    end
+    i
+    if exist('fvect')
+        disp(mean(fvect)*pwz);
+        disp(std(fvect)*pwz);
+    end
+end
+
+% init = 0;
+% %X & Y autocorr
+% %for i = 1:numSections
+% for i = 1:28
+%     %figure(1);
+%     imgA = img(:,:,i);
+%     imgB = flipud(fliplr(imgA));          
+%     
+%     %only calc if there is data in image
+%     if mean(mean(imgA)) > 5
+%         %use convn to get autocorr
+%         cc = convn(imgA,imgB,'same');
+% 
+%         i
+%         figure(1);
+%         plot(xvec,xc);
+%         title('x-dir autocorr');
+%         xlabel('microns');
+% 
+%         figure(2);
+%         plot(yvec,yc);
+%         title('y-dir autocorr');
+%         xlabel('microns');
+%     end            
+% end
+% %%
+% init = 0;
+% for i = 1:imw
+%     imgA = squeeze(img(:,i,:));
+%     imgB = flipud(fliplr(imgA));
+%     
+%     %only accumulate if there is data in image
+%     if mean(mean(imgA)) > 5
+%         %use convn to get autocorr
+%         cc = convn(imgA,imgB,'same');
+%         if init == 0
+%             %init filter          
+%             %Z = column
+%             zc = cc(imw2,:);
+%             init = 1;
+%         else
+%             %IIR filter autocorrelation
+%             %Z = column
+%             zc = 0.5*cc(imw2,:) + 0.5*zc;
+%         end
+%         i
+% 
+%         figure(3);
+%         plot(zvec,zc);
+%         title('z-dir autocorr');
+%         xlabel('microns');
+%     end  
+%             
+%     
+% end
